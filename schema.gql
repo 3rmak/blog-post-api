@@ -41,6 +41,7 @@ enum BlogPostDecisionEnum {
 }
 
 input CreateBlogPostDto {
+  avatar: Upload!
   blogId: String!
   description: String!
   title: String!
@@ -126,6 +127,9 @@ input UpdateUserInput {
   fullName: String
   password: String
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 type User {
   blogs: [Blog!]

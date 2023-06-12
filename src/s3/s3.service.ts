@@ -10,12 +10,16 @@ import {
 
 import { join, extname } from 'path';
 import { _Object } from '@aws-sdk/client-s3/dist-types/models/models_0';
+import { FileUpload } from 'graphql-upload';
+import { FileReadUtility } from '../shared/utils/file-read.utility';
+
 import { S3UploadImageDto } from './dto/s3-upload-image.dto';
 
 @Injectable()
 export class S3Service {
   private readonly bucketname: string;
   private readonly storagePrefix: string;
+  private readonly fileUtility: FileReadUtility;
 
   constructor(
     @Inject('S3_PROVIDER') private s3Client: S3Client,
@@ -23,18 +27,20 @@ export class S3Service {
   ) {
     this.bucketname = configService.get('S3_BUCKET_NAME');
     this.storagePrefix = configService.get('S3_STORAGE_PREFIX');
+    this.fileUtility = new FileReadUtility();
   }
 
   public getStoragePrefix(): string {
     return this.storagePrefix;
   }
 
-  public async uploadImage(image: Express.Multer.File, dto: S3UploadImageDto): Promise<string> {
-    const imageKey = this.pathConstructor(image.originalname, dto);
+  public async uploadImage(image: FileUpload, dto: S3UploadImageDto): Promise<string> {
+    const fileBuffer = await this.fileUtility.getFileBuffer(image);
+    const imageKey = this.pathConstructor(image.filename, dto);
     const command = new PutObjectCommand({
       Bucket: this.bucketname,
       Key: imageKey,
-      Body: image.buffer,
+      Body: fileBuffer,
       CacheControl: 'max-age=63072000',
     });
 

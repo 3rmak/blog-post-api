@@ -23,7 +23,7 @@ export class BlogService {
   public async createBlog(publisherId: string, dto: BlogCreateDto) {
     const blog = await this.blogRepository
       .createQueryBuilder('blog')
-      .where('publisher.publisherId = :publisherId', { publisherId })
+      .where('blog.publisherId = :publisherId', { publisherId })
       .andWhere('blog.name = :blogName', { blogName: dto.name })
       .getOne();
 
@@ -33,7 +33,7 @@ export class BlogService {
     }
 
     try {
-      const blogBody = { ...dto, publisherId: publisherId };
+      const blogBody = { ...dto, publisher: { id: publisherId } };
       return await this.blogRepository.save(blogBody);
     } catch (e) {
       throw new InternalServerErrorException(`blog wasn't created. Error: ${e.message}`);

@@ -34,23 +34,23 @@ export class BlogPostService {
     private readonly entityManager: EntityManager,
   ) {}
 
-  public async createBlogPost(
-    publisherId: string,
-    uploadImage: Express.Multer.File,
-    body: CreateBlogPostDto,
-  ): Promise<BlogPost> {
-    const { blogId } = body;
+  public async createBlogPost(publisherId: string, body: CreateBlogPostDto): Promise<BlogPost> {
+    const { blogId, title, description } = body;
+    const avatar = await body.avatar;
 
     // check if blog exist and belongs to publisherId
     await this.blogService.getBlogByPublisherAndId(blogId, publisherId);
 
     try {
       return await this.entityManager.transaction(async (transactionDbManager) => {
-        const blogPost = transactionDbManager.create(BlogPost, {
-          ...body,
+        const blogPostCreationParams = {
+          title,
+          description,
           status: BlogPostStatusEnum.ON_REVIEW,
-        });
-        const avatarUrl = await this.s3Service.uploadImage(uploadImage, {
+          blog: { id: blogId },
+        };
+        const blogPost = await transactionDbManager.save(BlogPost, blogPostCreationParams);
+        const avatarUrl = await this.s3Service.uploadImage(avatar, {
           publisherId,
           blogId,
           postId: blogPost.id,

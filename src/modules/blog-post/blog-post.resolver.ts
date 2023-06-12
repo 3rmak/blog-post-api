@@ -1,7 +1,8 @@
-import { UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import { GraphQLVoid } from 'graphql-scalars';
 
 import { BlogPostService } from './blog-post.service';
@@ -14,7 +15,6 @@ import { GqlRoles } from '../auth/role-auth.decorator';
 import { PaginationDto } from '../../shared/pagination.dto';
 import { RequestUser } from '../../shared/decorators/user.decorator';
 import { PayloadUser } from '../../shared/payload-user.interface';
-import { PaginatedResponseDto } from '../../shared/dto/paginated-response.dto';
 import { RolesEnum } from '../role/entity/roles.enum';
 import { CreateBlogPostDto } from './dto/create-blog-post.dto';
 import { BlogPost } from './entity/blog-post.entity';
@@ -37,14 +37,14 @@ export class BlogPostResolver {
   @Mutation(() => BlogPost, { name: 'createBlogPost' })
   @UseGuards(GqlRolesGuard)
   @GqlRoles(RolesEnum.WRITER)
-  @UseInterceptors(FileInterceptor('image'))
   public async createBlogPost(
     @RequestUser() user: PayloadUser,
-    @UploadedFile() uploadImage: Express.Multer.File,
     @Args('createBlogPostInput') body: CreateBlogPostDto,
   ): Promise<BlogPost> {
-    return await this.blogPostService.createBlogPost(user.id, uploadImage, body);
+    return await this.blogPostService.createBlogPost(user.id, body);
   }
+
+  // @Args('file', { type: () => GraphQLUpload }) file: FileUpload,
 
   @Query(() => BlogPost, { name: 'getBlogPostById' })
   @UseGuards(JwtResolveGuard)

@@ -23,7 +23,6 @@ export class GqlRolesGuard implements CanActivate {
       if (!requiredRoles) {
         return true;
       }
-      console.log('req.headers', req.headers);
 
       const authHeader = req.headers.authorization;
       if (!authHeader) throw new ForbiddenException(`Bearer token is required`);
@@ -40,8 +39,6 @@ export class GqlRolesGuard implements CanActivate {
         throw new ForbiddenException({ message: 'Invalid token' });
       }
 
-      console.log('req.user', req.user);
-      console.log('req.user.role', req.user.role);
       return requiredRoles.includes(req.user.role);
     } catch (e) {
       throw e;
