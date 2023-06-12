@@ -10,7 +10,7 @@ import { RolesEnum } from './roles.enum';
 export class Role {
   @Field()
   @PrimaryGeneratedColumn('increment')
-  @Column({ unique: true, primary: true })
+  @Column({ type: 'smallint', unique: true, primary: true })
   public id: number;
 
   @Field()

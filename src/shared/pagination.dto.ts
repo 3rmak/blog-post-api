@@ -1,7 +1,7 @@
-import { ArgsType, Field } from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
 import { IsPositive, IsOptional } from 'class-validator';
 
-@ArgsType()
+@InputType()
 export class PaginationDto {
   @IsOptional()
   @IsPositive()

@@ -1,6 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { randomUUID } from 'crypto';
 
 import { Blog } from '../../blog/entity/blog.entity';
 import { Role } from '../../role/entity/role.entity';
@@ -13,8 +12,7 @@ export const UserPasswordRegex = new RegExp(
 @Entity({ name: 'users' })
 export class User {
   @Field(() => ID)
-  @PrimaryGeneratedColumn()
-  @Column({ type: 'uuid', primary: true, unique: true, nullable: false, default: randomUUID() })
+  @PrimaryGeneratedColumn('uuid')
   public id: string;
 
   @Field()
@@ -28,6 +26,10 @@ export class User {
   @Field({ nullable: true })
   @Column({ type: 'varchar', nullable: true, default: null })
   public fullName: string;
+
+  @Field()
+  @Column({ type: 'smallint', nullable: false })
+  public roleId: string;
 
   @Field(() => Role)
   @OneToMany(() => Role, (role) => role.users)

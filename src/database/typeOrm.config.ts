@@ -17,4 +17,6 @@ export default new DataSource({
   password: configService.get<string>('DB_PASSWORD'),
   database: configService.get<string>('DB_NAME'),
   entities: ['dist/**/*.entity{.js}'],
+  migrations: [resolve(__dirname, 'migrations/*.{ts,js}')],
+  migrationsRun: true,
 } as DataSourceOptions);

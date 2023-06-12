@@ -1,6 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { randomUUID } from 'crypto';
 
 import { BlogPost } from '../../blog-post/entity/blog-post.entity';
 import { User } from '../../user/entity/user.entity';
@@ -9,8 +8,7 @@ import { User } from '../../user/entity/user.entity';
 @Entity({ name: 'blogs' })
 export class Blog {
   @Field(() => ID)
-  @PrimaryGeneratedColumn()
-  @Column({ type: 'uuid', unique: true, primary: true, default: randomUUID() })
+  @PrimaryGeneratedColumn('uuid')
   public id: string;
 
   @Field()

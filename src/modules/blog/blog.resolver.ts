@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { VoidTypeDefinition } from 'graphql-scalars';
+import { GraphQLVoid } from 'graphql-scalars';
 
 import { GqlRolesGuard } from '../auth/gql-roles-guard.service';
 import { RolesEnum } from '../role/entity/roles.enum';
@@ -64,7 +64,7 @@ export class BlogResolver {
     return this.blogService.patchBlog(user.id, body);
   }
 
-  @Mutation(() => VoidTypeDefinition, { name: 'deleteBlogById' })
+  @Mutation(() => GraphQLVoid, { name: 'deleteBlogById' })
   @UseGuards(GqlRolesGuard)
   @GqlRoles(RolesEnum.WRITER)
   public async deleteBlogById(

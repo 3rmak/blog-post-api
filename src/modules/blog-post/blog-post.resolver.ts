@@ -2,7 +2,7 @@ import { UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { VoidTypeDefinition } from 'graphql-scalars';
+import { GraphQLVoid } from 'graphql-scalars';
 
 import { BlogPostService } from './blog-post.service';
 import { PaginationUtility } from '../../shared/utils/pagination.utility';
@@ -90,7 +90,7 @@ export class BlogPostResolver {
     return await this.blogPostService.handleModeratorDecision(dto);
   }
 
-  @Mutation(() => VoidTypeDefinition, { name: 'deleteBlogPost' })
+  @Mutation(() => GraphQLVoid, { name: 'deleteBlogPost' })
   @UseGuards(GqlRolesGuard)
   @GqlRoles(RolesEnum.WRITER)
   public async deleteBlogPost(

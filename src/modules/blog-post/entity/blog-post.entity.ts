@@ -1,6 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { Column, CreateDateColumn, Entity, ManyToOne } from 'typeorm';
-import { randomUUID } from 'crypto';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Blog } from '../../blog/entity/blog.entity';
 import { BlogPostStatusEnum } from './blog-post-status.enum';
@@ -9,7 +8,7 @@ import { BlogPostStatusEnum } from './blog-post-status.enum';
 @Entity({ name: 'blog-posts' })
 export class BlogPost {
   @Field(() => ID)
-  @Column({ type: 'uuid', unique: true, primary: true, default: randomUUID() })
+  @PrimaryGeneratedColumn('uuid')
   public id: string;
 
   @Field()

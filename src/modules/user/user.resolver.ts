@@ -1,6 +1,6 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
-import { VoidTypeDefinition } from 'graphql-scalars';
+import { GraphQLVoid } from 'graphql-scalars';
 
 import { UserService } from './user.service';
 import { GqlRolesGuard } from '../auth/gql-roles-guard.service';
@@ -33,7 +33,7 @@ export class UserResolver {
     return await this.usersService.updateUserProfile(user.id, dto);
   }
 
-  @Mutation(() => VoidTypeDefinition, { name: 'deleteUserProfile' })
+  @Mutation(() => GraphQLVoid, { name: 'deleteUserProfile' })
   @UseGuards(GqlRolesGuard)
   @GqlRoles(RolesEnum.WRITER, RolesEnum.MODERATOR)
   public async deleteUserProfile(@RequestUser() user: PayloadUser): Promise<void> {

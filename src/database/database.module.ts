@@ -22,8 +22,8 @@ export class DatabaseModule {
               password: configService.get<string>('DB_PASSWORD'),
               database: configService.get<string>('DB_NAME'),
               entities: ['dist/modules/**/*.entity.js'],
-              // migrations: this.getMigrationsPath(nodeEnv),
-              // migrationsRun: true,
+              migrations: this.getMigrationsPath(nodeEnv),
+              migrationsRun: true,
               autoLoadEntities: true,
               synchronize: true,
             } as TypeOrmModuleOptions),
@@ -33,7 +33,7 @@ export class DatabaseModule {
   }
 
   private static getMigrationsPath(nodeEnv: string): string[] {
-    const allMigrations = [resolve(process.cwd(), 'src', 'database', 'migrations/*.ts')];
+    const allMigrations = [resolve(process.cwd(), 'dist', 'database', 'migrations/*.js')];
     console.log('allMigrations', allMigrations);
     return nodeEnv === 'test' ? [] : allMigrations;
   }
