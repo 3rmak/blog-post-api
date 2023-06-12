@@ -1,12 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 
 import { Blog } from '../../blog/entity/blog.entity';
 import { Role } from '../../role/entity/role.entity';
 
-export const UserPasswordRegex = new RegExp(
-  '^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{8,64})',
-);
+// export const UserPasswordRegex = new RegExp('^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{8,64})');
+export const UserPasswordRegex = new RegExp('[a-z]{8,64}');
 
 @ObjectType()
 @Entity({ name: 'users' })
@@ -27,12 +26,8 @@ export class User {
   @Column({ type: 'varchar', nullable: true, default: null })
   public fullName: string;
 
-  @Field()
-  @Column({ type: 'smallint', nullable: false })
-  public roleId: string;
-
   @Field(() => Role)
-  @OneToMany(() => Role, (role) => role.users)
+  @ManyToOne(() => Role, (role) => role.users)
   public role: Role;
 
   @Field(() => [Blog], { nullable: true })

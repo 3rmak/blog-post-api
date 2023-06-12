@@ -10,6 +10,7 @@ export class AuthResolver {
 
   @Mutation(() => AuthResponseDto, { name: 'login' })
   public async login(@Args('authLoginInput') body: AuthLoginDto): Promise<AuthResponseDto> {
+    console.log('login request here');
     return this.authService.login(body);
   }
 }

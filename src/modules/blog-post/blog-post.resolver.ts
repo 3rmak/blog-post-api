@@ -8,7 +8,7 @@ import { BlogPostService } from './blog-post.service';
 import { PaginationUtility } from '../../shared/utils/pagination.utility';
 
 import { JwtResolveGuard } from '../auth/jwt-resolve.guard';
-import { GqlRolesGuard } from '../auth/gql-roles-guard.service';
+import { GqlRolesGuard } from '../auth/gql-roles-guard';
 import { GqlRoles } from '../auth/role-auth.decorator';
 
 import { PaginationDto } from '../../shared/pagination.dto';
@@ -20,6 +20,7 @@ import { CreateBlogPostDto } from './dto/create-blog-post.dto';
 import { BlogPost } from './entity/blog-post.entity';
 import { UpdateBlogPostDto } from './dto/update-blog-post.dto';
 import { UpdateBlogPostDecisionDto } from './dto/update-blog-post-decision.dto';
+import { PaginatedBlogPostResponseDto } from './dto/paginated-blog-post.response.dto';
 
 @Resolver(() => BlogPost)
 export class BlogPostResolver {
@@ -54,11 +55,11 @@ export class BlogPostResolver {
     return this.blogPostService.getBlogPostByIdAccordingToAvailability(blogPostId, user?.id);
   }
 
-  @Query(() => PaginatedResponseDto<BlogPost>, { name: 'getPostsByBlogId' })
+  @Query(() => PaginatedBlogPostResponseDto, { name: 'getPostsByBlogId' })
   public async getPostsByBlogId(
     @Args('paginateDtoInput') query: PaginationDto,
     @Args('blogId') blogId: string,
-  ): Promise<PaginatedResponseDto<BlogPost>> {
+  ): Promise<PaginatedBlogPostResponseDto> {
     const typeOrmQuery = this.paginationUtil.parse(query);
     const { data, total } = await this.blogPostService.getPostsByBlogId(blogId, typeOrmQuery);
 

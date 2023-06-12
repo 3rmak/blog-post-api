@@ -25,7 +25,7 @@ export class DefaultModeratorUserMigration1686566874682 implements MigrationInte
       const hashPassword = await bcrypt.hash('password', 5);
       await queryRunner.query(
         'INSERT INTO users (id, email, password, "roleId") \n' +
-          `VALUES ('${defaultModeratorId}', 'moderator@local', '${hashPassword}', '${moderatorRoleId}');`,
+          `VALUES ('${defaultModeratorId}', 'moderator@local.com', '${hashPassword}', '${moderatorRoleId}');`,
       );
       await queryRunner.commitTransaction();
     } catch (e) {

@@ -3,7 +3,7 @@ import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { GraphQLVoid } from 'graphql-scalars';
 
 import { UserService } from './user.service';
-import { GqlRolesGuard } from '../auth/gql-roles-guard.service';
+import { GqlRolesGuard } from '../auth/gql-roles-guard';
 import { GqlRoles } from '../auth/role-auth.decorator';
 import { RequestUser } from '../../shared/decorators/user.decorator';
 
@@ -20,7 +20,14 @@ export class UserResolver {
 
   @Mutation(() => User, { name: 'createUser' })
   public async createUser(@Args('createUserInput') body: CreateUserInput): Promise<User> {
-    return await this.usersService.createUser(body);
+    return await this.usersService.createWriterUser(body);
+  }
+
+  @Mutation(() => User, { name: 'createModeratorUser' })
+  @UseGuards(GqlRolesGuard)
+  @GqlRoles(RolesEnum.MODERATOR)
+  public async createModeratorUser(@Args('createUserInput') body: CreateUserInput): Promise<User> {
+    return await this.usersService.createModeratorUser(body);
   }
 
   @Mutation(() => User, { name: 'updateUserProfile' })
@@ -30,7 +37,7 @@ export class UserResolver {
     @Args('updateUserInput') dto: UpdateUserInput,
     @RequestUser() user: PayloadUser,
   ): Promise<User> {
-    return await this.usersService.updateUserProfile(user.id, dto);
+    return await this.usersService.updateUserProfile('53231f78-13d6-11ed-861d-0242ac120002', dto);
   }
 
   @Mutation(() => GraphQLVoid, { name: 'deleteUserProfile' })

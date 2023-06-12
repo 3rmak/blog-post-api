@@ -21,4 +21,8 @@ export class RolesService {
       .orIgnore()
       .execute();
   }
+
+  public async getRoleByValue(value: RolesEnum): Promise<Role> {
+    return await this.rolesRepository.findOne({ where: { value } });
+  }
 }

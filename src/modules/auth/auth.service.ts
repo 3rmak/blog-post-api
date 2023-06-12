@@ -14,7 +14,7 @@ export class AuthService {
   constructor(private readonly userService: UserService, private readonly jwtService: JwtService) {}
 
   public async login(body: AuthLoginDto): Promise<AuthResponseDto> {
-    const user = await this.userService.getUserByEmail(body.email);
+    let user = await this.userService.getUserByEmail(body.email);
     if (!user) {
       throw new BadRequestException('User with this email does not exist');
     }
@@ -24,12 +24,14 @@ export class AuthService {
       throw new BadRequestException('Invalid password');
     }
 
+    user = await this.userService.getUserById(user.id);
+    console.log('user', JSON.stringify(user));
     const token = await this.generateToken(user);
     return new AuthResponseDto(user, token);
   }
 
   public async generateToken(user: User): Promise<string> {
-    const { id, email } = user;
-    return this.jwtService.sign({ id, email });
+    const { id, email, role } = user;
+    return this.jwtService.sign({ id, email, role: role.value });
   }
 }

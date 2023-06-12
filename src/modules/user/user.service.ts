@@ -12,24 +12,43 @@ import { User } from './entity/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { join } from 'path';
+import { RolesService } from '../role/roles.service';
+import { RolesEnum } from '../role/entity/roles.enum';
+import { Role } from '../role/entity/role.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private rolesService: RolesService,
     private s3Service: S3Service,
     private readonly entityManager: EntityManager,
   ) {}
 
-  public async createUser(body: CreateUserInput): Promise<User> {
+  public async createWriterUser(body: CreateUserInput): Promise<User> {
     const userCandidate = await this.getUserByEmail(body.email);
     if (userCandidate) {
       throw new BadRequestException('User with this email already exists');
     }
 
     try {
-      const hashedPassword = await this.hashPassword(body.password);
-      return this.userRepository.save({ ...body, password: hashedPassword });
+      const role = await this.rolesService.getRoleByValue(RolesEnum.WRITER);
+
+      return await this.createUser(body, role);
+    } catch (e) {
+      throw new InternalServerErrorException(`Can't create user. Error: ${e.message}`);
+    }
+  }
+
+  public async createModeratorUser(body: CreateUserInput): Promise<User> {
+    const userCandidate = await this.getUserByEmail(body.email);
+    if (userCandidate) {
+      throw new BadRequestException('User with this email already exists');
+    }
+
+    try {
+      const role = await this.rolesService.getRoleByValue(RolesEnum.MODERATOR);
+      return this.createUser(body, role);
     } catch (e) {
       throw new InternalServerErrorException(`Can't create user. Error: ${e.message}`);
     }
@@ -48,13 +67,7 @@ export class UserService {
   }
 
   public async getUserByEmail(email: string): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { email },
-      relations: { blogs: true },
-    });
-    if (!user) {
-      throw new NotFoundException(`Can't find user with email: ${email}`);
-    }
+    const user = await this.userRepository.findOneBy({ email });
 
     return user;
   }
@@ -93,6 +106,13 @@ export class UserService {
     } catch (e) {
       throw new InternalServerErrorException(`Can't delete blog. Error: ${e.message}`);
     }
+  }
+
+  private async createUser(body: CreateUserInput, role: Role) {
+    const password = await this.hashPassword(body.password);
+    const user = await this.userRepository.save({ ...body, password, role: { id: role.id } });
+
+    return this.getUserById(user.id);
   }
 
   private async hashPassword(password: string): Promise<string> {

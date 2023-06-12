@@ -60,6 +60,7 @@ scalar DateTime
 type Mutation {
   createBlog(createBlogInput: BlogCreateDto!): Blog!
   createBlogPost(createBlogPostInput: CreateBlogPostDto!): BlogPost!
+  createModeratorUser(createUserInput: CreateUserInput!): User!
   createUser(createUserInput: CreateUserInput!): User!
   deleteBlogById(blogId: String!): Void!
   deleteBlogPost(blogPostId: String!): Void!
@@ -71,8 +72,16 @@ type Mutation {
   updateUserProfile(updateUserInput: UpdateUserInput!): User!
 }
 
-type PaginatedResponseDto {
-  data: [ResultUnion!]!
+type PaginatedBlogPostResponseDto {
+  data: [BlogPost!]!
+  page: Float!
+  perPage: Float!
+  total: Float!
+  totalPages: Float!
+}
+
+type PaginatedBlogResponseDto {
+  data: [Blog!]!
   page: Float!
   perPage: Float!
   total: Float!
@@ -86,11 +95,9 @@ input PaginationDto {
 
 type Query {
   getBlogPostById(blogPostId: String!): BlogPost!
-  getPaginatedBlogsList(paginateDtoInput: PaginationDto!): PaginatedResponseDto!
-  getPostsByBlogId(blogId: String!, paginateDtoInput: PaginationDto!): PaginatedResponseDto!
+  getPaginatedBlogsList(paginateDtoInput: PaginationDto!): PaginatedBlogResponseDto!
+  getPostsByBlogId(blogId: String!, paginateDtoInput: PaginationDto!): PaginatedBlogPostResponseDto!
 }
-
-union ResultUnion = Blog | BlogPost | User
 
 type Role {
   id: Float!
@@ -127,7 +134,6 @@ type User {
   id: ID!
   password: String!
   role: Role!
-  roleId: String!
 }
 
 """Represents NULL values"""

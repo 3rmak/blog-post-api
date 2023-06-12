@@ -3,7 +3,7 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { GraphQLVoid } from 'graphql-scalars';
 
-import { GqlRolesGuard } from '../auth/gql-roles-guard.service';
+import { GqlRolesGuard } from '../auth/gql-roles-guard';
 import { RolesEnum } from '../role/entity/roles.enum';
 import { GqlRoles } from '../auth/role-auth.decorator';
 import { RequestUser } from '../../shared/decorators/user.decorator';
@@ -17,7 +17,7 @@ import { BlogCreateDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { PayloadUser } from '../../shared/payload-user.interface';
 import { PaginationDto } from '../../shared/pagination.dto';
-import { PaginatedResponseDto } from '../../shared/dto/paginated-response.dto';
+import { PaginatedBlogResponseDto } from './dto/paginated-blog.response.dto';
 
 @Resolver(() => Blog)
 export class BlogResolver {
@@ -38,10 +38,10 @@ export class BlogResolver {
     return await this.blogService.createBlog(user.id, body);
   }
 
-  @Query(() => PaginatedResponseDto<Blog>, { name: 'getPaginatedBlogsList' })
+  @Query(() => PaginatedBlogResponseDto, { name: 'getPaginatedBlogsList' })
   public async getPaginatedBlogsList(
     @Args('paginateDtoInput') query: PaginationDto,
-  ): Promise<PaginatedResponseDto<Blog>> {
+  ): Promise<PaginatedBlogResponseDto> {
     const typeOrmQuery = this.paginationUtil.parse(query);
     const { data, total } = await this.blogService.getPaginatedBlogsList(typeOrmQuery);
 
