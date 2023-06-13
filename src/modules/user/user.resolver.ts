@@ -18,19 +18,19 @@ import { UpdateUserInput } from './dto/update-user.input';
 export class UserResolver {
   constructor(private readonly usersService: UserService) {}
 
-  @Mutation(() => User, { name: 'createUser' })
+  @Mutation(() => User)
   public async createUser(@Args('createUserInput') body: CreateUserInput): Promise<User> {
     return await this.usersService.createWriterUser(body);
   }
 
-  @Mutation(() => User, { name: 'createModeratorUser' })
+  @Mutation(() => User)
   @UseGuards(GqlRolesGuard)
   @GqlRoles(RolesEnum.MODERATOR)
   public async createModeratorUser(@Args('createUserInput') body: CreateUserInput): Promise<User> {
     return await this.usersService.createModeratorUser(body);
   }
 
-  @Mutation(() => User, { name: 'updateUserProfile' })
+  @Mutation(() => User)
   @UseGuards(GqlRolesGuard)
   @GqlRoles(RolesEnum.WRITER, RolesEnum.MODERATOR)
   public async updateUserProfile(
@@ -40,7 +40,7 @@ export class UserResolver {
     return await this.usersService.updateUserProfile('53231f78-13d6-11ed-861d-0242ac120002', dto);
   }
 
-  @Mutation(() => GraphQLVoid, { name: 'deleteUserProfile' })
+  @Mutation(() => GraphQLVoid)
   @UseGuards(GqlRolesGuard)
   @GqlRoles(RolesEnum.WRITER, RolesEnum.MODERATOR)
   public async deleteUserProfile(@RequestUser() user: PayloadUser): Promise<void> {

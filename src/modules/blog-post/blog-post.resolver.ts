@@ -33,7 +33,7 @@ export class BlogPostResolver {
     this.paginationUtil = new PaginationUtility(defaultPerPage);
   }
 
-  @Mutation(() => BlogPost, { name: 'createBlogPost' })
+  @Mutation(() => BlogPost)
   @UseGuards(GqlRolesGuard)
   @GqlRoles(RolesEnum.WRITER)
   public async createBlogPost(
@@ -43,7 +43,7 @@ export class BlogPostResolver {
     return await this.blogPostService.createBlogPost(user.id, body);
   }
 
-  @Query(() => BlogPost, { name: 'getBlogPostById' })
+  @Query(() => BlogPost)
   @UseGuards(JwtResolveGuard)
   public async getBlogPostById(
     @Args('blogPostId') blogPostId: string,
@@ -52,7 +52,7 @@ export class BlogPostResolver {
     return this.blogPostService.getBlogPostByIdAccordingToAvailability(blogPostId, user?.id);
   }
 
-  @Query(() => PaginatedBlogPostResponseDto, { name: 'getPostsByBlogId' })
+  @Query(() => PaginatedBlogPostResponseDto)
   public async getPostsByBlogId(
     @Args('paginateDtoInput') query: PaginationDto,
     @Args('blogId') blogId: string,
@@ -69,7 +69,7 @@ export class BlogPostResolver {
     };
   }
 
-  @Mutation(() => BlogPost, { name: 'updateBlogPost' })
+  @Mutation(() => BlogPost)
   @UseGuards(GqlRolesGuard)
   @GqlRoles(RolesEnum.WRITER)
   public async updateBlogPost(
@@ -79,7 +79,7 @@ export class BlogPostResolver {
     return await this.blogPostService.updateBlogPost(user.id, dto);
   }
 
-  @Mutation(() => BlogPost, { name: 'updateBlogPostAvatar' })
+  @Mutation(() => BlogPost)
   @UseGuards(GqlRolesGuard)
   @GqlRoles(RolesEnum.WRITER)
   public async updateBlogPostAvatar(
@@ -99,7 +99,7 @@ export class BlogPostResolver {
     return await this.blogPostService.handleModeratorDecision(dto);
   }
 
-  @Mutation(() => GraphQLVoid, { name: 'deleteBlogPost' })
+  @Mutation(() => GraphQLVoid)
   @UseGuards(GqlRolesGuard)
   @GqlRoles(RolesEnum.WRITER)
   public async deleteBlogPost(

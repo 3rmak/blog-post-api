@@ -11,6 +11,8 @@ import { UpdateBlogDto } from './dto/update-blog.dto';
 import { FilteredResponseDto } from '../../shared/dto/filtered-response.dto';
 import { S3Service } from '../../s3/s3.service';
 import { join } from 'path';
+import { User } from '../user/entity/user.entity';
+import { BlogPost } from '../blog-post/entity/blog-post.entity';
 
 @Injectable()
 export class BlogService {
@@ -34,18 +36,19 @@ export class BlogService {
 
     try {
       const blogBody = { ...dto, publisher: { id: publisherId } };
-      return await this.blogRepository.save(blogBody);
+      const blog = await this.blogRepository.save(blogBody);
+
+      return this.getBlogByPublisherAndId(blog.id, publisherId);
     } catch (e) {
       throw new InternalServerErrorException(`blog wasn't created. Error: ${e.message}`);
     }
   }
 
   public async getBlogByPublisherAndId(blogId: string, publisherId: string): Promise<Blog> {
-    const blog = await this.blogRepository
-      .createQueryBuilder('blog')
-      .where('blog.publisherId = :publisherId', { publisherId })
-      .andWhere('blog.id = :blogId', { blogId })
-      .getOne();
+    const blog = await this.blogRepository.findOne({
+      where: { publisher: { id: publisherId }, id: blogId },
+      relations: { publisher: true, blogPosts: true },
+    });
 
     if (!blog) {
       throw new BadRequestException(`blog wasn't found or you're not owner`);

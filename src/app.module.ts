@@ -22,7 +22,7 @@ import { AppController } from './app.controller';
       isGlobal: true,
     }),
     DatabaseModule.registerAsync(process.env.NODE_ENV),
-    GraphQLModule.forRoot(<ApolloDriverConfig>{
+    GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
       sortSchema: true,

@@ -28,7 +28,6 @@ export class DatabaseModule {
               password: configService.get<string>('DB_PASSWORD'),
               database: configService.get<string>('DB_NAME'),
               entities: [Blog, BlogPost, Role, User],
-              //   entities: [__dirname + '/**/*.entity{.ts,.js}'],
               migrations: this.getMigrationsPath(nodeEnv),
               migrationsRun: true,
               autoLoadEntities: true,

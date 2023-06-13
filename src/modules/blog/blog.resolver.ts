@@ -28,7 +28,7 @@ export class BlogResolver {
     this.paginationUtil = new PaginationUtility(defaultPerPage);
   }
 
-  @Mutation(() => Blog, { name: 'createBlog' })
+  @Mutation(() => Blog)
   @UseGuards(GqlRolesGuard)
   @GqlRoles(RolesEnum.WRITER)
   public async createBlog(
@@ -38,7 +38,7 @@ export class BlogResolver {
     return await this.blogService.createBlog(user.id, body);
   }
 
-  @Query(() => PaginatedBlogResponseDto, { name: 'getPaginatedBlogsList' })
+  @Query(() => PaginatedBlogResponseDto)
   public async getPaginatedBlogsList(
     @Args('paginateDtoInput') query: PaginationDto,
   ): Promise<PaginatedBlogResponseDto> {
@@ -54,7 +54,7 @@ export class BlogResolver {
     };
   }
 
-  @Mutation(() => Blog, { name: 'patchBlog' })
+  @Mutation(() => Blog)
   @UseGuards(GqlRolesGuard)
   @GqlRoles(RolesEnum.WRITER)
   public async patchBlog(
@@ -64,7 +64,7 @@ export class BlogResolver {
     return this.blogService.patchBlog(user.id, body);
   }
 
-  @Mutation(() => GraphQLVoid, { name: 'deleteBlogById' })
+  @Mutation(() => GraphQLVoid)
   @UseGuards(GqlRolesGuard)
   @GqlRoles(RolesEnum.WRITER)
   public async deleteBlogById(

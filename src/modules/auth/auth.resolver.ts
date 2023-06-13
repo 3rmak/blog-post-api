@@ -8,9 +8,8 @@ import { AuthResponseDto } from './dto/auth.response.dto';
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
-  @Mutation(() => AuthResponseDto, { name: 'login' })
+  @Mutation(() => AuthResponseDto)
   public async login(@Args('authLoginInput') body: AuthLoginDto): Promise<AuthResponseDto> {
-    console.log('login request here');
     return this.authService.login(body);
   }
 }
