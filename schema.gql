@@ -41,7 +41,6 @@ enum BlogPostDecisionEnum {
 }
 
 input CreateBlogPostDto {
-  avatar: Upload!
   blogId: String!
   description: String!
   title: String!
@@ -70,6 +69,7 @@ type Mutation {
   login(authLoginInput: AuthLoginDto!): AuthResponseDto!
   patchBlog(updateBlogInput: UpdateBlogDto!): Blog!
   updateBlogPost(updateBlogPostInput: UpdateBlogPostDto!): BlogPost!
+  updateBlogPostAvatar(avatar: Upload!, blogPostId: String!): BlogPost!
   updateUserProfile(updateUserInput: UpdateUserInput!): User!
 }
 

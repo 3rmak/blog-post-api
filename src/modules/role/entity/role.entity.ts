@@ -1,8 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { User } from '../../user/entity/user.entity';
-
 import { RolesEnum } from './roles.enum';
 
 @ObjectType('Role')
@@ -10,11 +9,10 @@ import { RolesEnum } from './roles.enum';
 export class Role {
   @Field()
   @PrimaryGeneratedColumn('increment')
-  @Column({ type: 'smallint', unique: true, primary: true })
   public id: number;
 
   @Field()
-  @Column({ type: 'enum', enum: RolesEnum, unique: true, nullable: false })
+  @Column({ enum: RolesEnum, unique: true, nullable: false })
   public value: RolesEnum;
 
   @Field(() => [User])

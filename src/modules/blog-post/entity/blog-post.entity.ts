@@ -3,7 +3,6 @@ import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } f
 
 import { Blog } from '../../blog/entity/blog.entity';
 import { BlogPostStatusEnum } from './blog-post-status.enum';
-
 @ObjectType()
 @Entity({ name: 'blog-posts' })
 export class BlogPost {
@@ -21,7 +20,6 @@ export class BlogPost {
 
   @Field()
   @Column({
-    type: 'enum',
     enum: BlogPostStatusEnum,
     nullable: false,
     default: BlogPostStatusEnum.ON_REVIEW,
@@ -34,7 +32,6 @@ export class BlogPost {
 
   @Field(() => Date)
   @CreateDateColumn()
-  @Column({ type: 'date', default: new Date() })
   public createdAt: Date;
 
   @Field(() => Blog)

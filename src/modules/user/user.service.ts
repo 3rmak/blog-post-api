@@ -67,6 +67,7 @@ export class UserService {
   }
 
   public async getUserByEmail(email: string): Promise<User> {
+    console.log(`email`, email);
     const user = await this.userRepository.findOneBy({ email });
 
     return user;
@@ -101,7 +102,9 @@ export class UserService {
 
         const folderPath = join(this.s3Service.getStoragePrefix(), user.id);
         const folderContent = await this.s3Service.listFolderContent(folderPath);
-        await this.s3Service.deleteObjects(folderContent);
+        if (folderContent.length) {
+          await this.s3Service.deleteObjects(folderContent);
+        }
       });
     } catch (e) {
       throw new InternalServerErrorException(`Can't delete blog. Error: ${e.message}`);

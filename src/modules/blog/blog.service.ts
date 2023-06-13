@@ -92,7 +92,9 @@ export class BlogService {
 
         const folderPath = join(this.s3Service.getStoragePrefix(), publisherId, blog.id);
         const folderContent = await this.s3Service.listFolderContent(folderPath);
-        await this.s3Service.deleteObjects(folderContent);
+        if (folderContent.length) {
+          await this.s3Service.deleteObjects(folderContent);
+        }
       });
     } catch (e) {
       throw new InternalServerErrorException(`Can't delete blog. Error: ${e.message}`);

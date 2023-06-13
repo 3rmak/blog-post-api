@@ -9,7 +9,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { logger });
   app.setGlobalPrefix(process.env.GLOBAL_PREFIX || 'api');
   app.useGlobalPipes(new ValidationPipe());
-  app.use(graphqlUploadExpress({ maxFileSize: 2 * 1000 * 1000 }));
+  app.use(graphqlUploadExpress({ maxFileSize: 5 * 1000 * 1000 }));
 
   const port = process.env.GLOBAL_PORT || 5000;
   await app.listen(port);

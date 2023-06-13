@@ -1,6 +1,5 @@
 import { UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import { GraphQLVoid } from 'graphql-scalars';
@@ -44,8 +43,6 @@ export class BlogPostResolver {
     return await this.blogPostService.createBlogPost(user.id, body);
   }
 
-  // @Args('file', { type: () => GraphQLUpload }) file: FileUpload,
-
   @Query(() => BlogPost, { name: 'getBlogPostById' })
   @UseGuards(JwtResolveGuard)
   public async getBlogPostById(
@@ -80,6 +77,17 @@ export class BlogPostResolver {
     @RequestUser() user: PayloadUser,
   ): Promise<BlogPost> {
     return await this.blogPostService.updateBlogPost(user.id, dto);
+  }
+
+  @Mutation(() => BlogPost, { name: 'updateBlogPostAvatar' })
+  @UseGuards(GqlRolesGuard)
+  @GqlRoles(RolesEnum.WRITER)
+  public async updateBlogPostAvatar(
+    @Args('avatar', { type: () => GraphQLUpload }) file: FileUpload,
+    @Args('blogPostId') blogPostId: string,
+    @RequestUser() user: PayloadUser,
+  ): Promise<BlogPost> {
+    return this.blogPostService.updateBlogPostAvatar(blogPostId, user.id, file);
   }
 
   @Mutation(() => BlogPost, { name: 'handleModeratorDecision' })

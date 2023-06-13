@@ -1,5 +1,4 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { FileUpload, GraphQLUpload } from 'graphql-upload';
 
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
@@ -18,7 +17,4 @@ export class CreateBlogPostDto {
   @IsString()
   @Field(() => String)
   public description: string;
-
-  @Field(() => GraphQLUpload)
-  public avatar: Promise<FileUpload>;
 }

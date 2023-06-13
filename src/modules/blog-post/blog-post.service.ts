@@ -23,6 +23,7 @@ import { UpdateBlogPostDecisionDto } from './dto/update-blog-post-decision.dto';
 import { BlogPostDecisionEnum } from './entity/blog-post-decision.enum';
 import { RolesEnum } from '../role/entity/roles.enum';
 import { UpdateBlogPostDto } from './dto/update-blog-post.dto';
+import { FileUpload } from 'graphql-upload';
 
 @Injectable()
 export class BlogPostService {
@@ -36,31 +37,19 @@ export class BlogPostService {
 
   public async createBlogPost(publisherId: string, body: CreateBlogPostDto): Promise<BlogPost> {
     const { blogId, title, description } = body;
-    const avatar = await body.avatar;
 
     // check if blog exist and belongs to publisherId
     await this.blogService.getBlogByPublisherAndId(blogId, publisherId);
 
     try {
-      return await this.entityManager.transaction(async (transactionDbManager) => {
-        const blogPostCreationParams = {
-          title,
-          description,
-          status: BlogPostStatusEnum.ON_REVIEW,
-          blog: { id: blogId },
-        };
-        const blogPost = await transactionDbManager.save(BlogPost, blogPostCreationParams);
-        const avatarUrl = await this.s3Service.uploadImage(avatar, {
-          publisherId,
-          blogId,
-          postId: blogPost.id,
-        });
-
-        blogPost.avatar = avatarUrl;
-        await transactionDbManager.save(blogPost);
-
-        return blogPost;
+      const blogPost = await this.blogPostRepository.save({
+        title,
+        description,
+        status: BlogPostStatusEnum.ON_REVIEW,
+        blog: { id: blogId },
       });
+
+      return this.getBlogPostById(blogPost.id);
     } catch (e) {
       throw new InternalServerErrorException(`Post was not created. Error: ${e.message}`);
     }
@@ -87,6 +76,18 @@ export class BlogPostService {
     throw new NotFoundException('Blog post was not found');
   }
 
+  public async getBlogPostById(blogPostId: string): Promise<BlogPost> {
+    const blogPost = await this.blogPostRepository.findOne({
+      where: { id: blogPostId },
+      relations: { blog: { publisher: true } },
+    });
+    if (!blogPost) {
+      throw new NotFoundException('Post not found');
+    }
+
+    return blogPost;
+  }
+
   public async getPostsByBlogId(
     blogId: string,
     query: PaginationTypeOrmResponseDto,
@@ -97,7 +98,7 @@ export class BlogPostService {
       const [rows, count] = await this.blogPostRepository
         .createQueryBuilder('blogPost')
         .where('blogPost.blogId = :blogId', { blogId })
-        .andWhere('blogPost.status = :status', { status: BlogPostStatusEnum.ON_REVIEW })
+        .andWhere('blogPost.status = :status', { status: BlogPostStatusEnum.PUBLISHED })
         .take(take)
         .skip(skip)
         .orderBy('createdAt', 'DESC')
@@ -130,6 +131,30 @@ export class BlogPostService {
     }
   }
 
+  public async updateBlogPostAvatar(
+    blogPostId: string,
+    publisherId: string,
+    file: FileUpload,
+  ): Promise<BlogPost> {
+    const blogPost = await this.getBlogPostById(blogPostId);
+    if (blogPost.blog.publisher.id != publisherId) {
+      throw new ForbiddenException('You are not allowed to patch this blog');
+    }
+
+    try {
+      const avatarUrl = await this.s3Service.uploadImage(file, {
+        publisherId,
+        blogId: blogPost.blog.id,
+        postId: blogPostId,
+      });
+
+      blogPost.avatar = avatarUrl;
+      return this.blogPostRepository.save(blogPost);
+    } catch (e) {
+      throw new InternalServerErrorException(`Unable to patch. Error:" ${e.message}`);
+    }
+  }
+
   public async handleModeratorDecision(dto: UpdateBlogPostDecisionDto): Promise<BlogPost> {
     const blogPost = await this.getBlogPostById(dto.blogPostId);
     if (blogPost.status != BlogPostStatusEnum.ON_REVIEW) {
@@ -155,22 +180,12 @@ export class BlogPostService {
       await this.entityManager.transaction(async (transactionDbManager) => {
         const avatarUrl = blogPost.avatar;
         await transactionDbManager.remove(blogPost);
-        await this.s3Service.deleteImageByUrl(avatarUrl);
+        if (avatarUrl) {
+          await this.s3Service.deleteImageByUrl(avatarUrl);
+        }
       });
     } catch (e) {
-      throw new InternalServerErrorException(`Image wasn't deleted. Error: ${e.message}`);
+      throw new InternalServerErrorException(`BlogPost wasn't deleted. Error: ${e.message}`);
     }
-  }
-
-  private async getBlogPostById(blogPostId: string): Promise<BlogPost> {
-    const image = await this.blogPostRepository.findOne({
-      where: { id: blogPostId },
-      relations: { blog: { publisher: true } },
-    });
-    if (!image) {
-      throw new NotFoundException('Post not found');
-    }
-
-    return image;
   }
 }
